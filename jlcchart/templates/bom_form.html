@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>JLCPCB stock query</title>
+  <style>
+textarea
+{
+    width: 98%;
+    height: auto;
+}
+  </style>
+</head>
+
+<body>
+    <div align="center">
+        <h1>Paste your BOM here</h1>
+        <textarea name="bom" rows="50" form="bomform" placeholder="Paste your CSV file here"></textarea>
+        <p/>
+        <form action="{{ url_for('bom.bom') }}" id="bomform" method="POST">
+            <input type="submit" value="Submit BOM">
+        </form>
+    </div>
+</body>
+</html>

@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>JLCPCB stock query: BOM</title>
+  <style>
+table, th, td {
+    border: 1px solid #ddd;
+    border-collapse: collapse;
+    padding: 8px;
+}
+th {
+    padding-top: 12px;
+    padding-bottom: 12px;
+    background-color: #04AA6D;
+    color: white;
+}
+tr:nth-child(even) {background-color: #f2f2f2;}
+tr:hover {background-color: #ddd;}
+.error {
+    background-color: #ff0000;
+    color: white;
+}
+  </style>
+  <script>
+      function add_to_db(code, id) {
+          fetch('{{ url_for('bom.add') }}', {
+              method:'POST',
+              headers: {
+                  'Content-Type': 'application/json'
+              },
+              body: JSON.stringify({
+                  'code': code
+              })
+          })
+              .then(response => {
+                  if (!response.ok) {
+                      return Promise.reject("Request failed")
+                  } else {
+                      return response.json()
+                  }
+              })
+              .then(data => {
+                  if (data.id) {
+                      document.getElementById(id).innerHTML = data.id;
+                      update_link();
+                  }
+              })
+              .catch((error) => {
+                  document.getElementById(id).innerHTML = '<div class="error">FAIL</div>';
+                  console.error('Error', error);
+              });
+      }
+      function update_link() {
+          var rows = {{table|length}};
+          var id_col = {{headings|length}};
+          var idlist = [];
+          for (let i = 1; i <= rows; i++) {
+              if (document.getElementById('select_' + i).checked) {
+                  var id = document.getElementById('td_' + i + '_' + id_col).innerHTML;
+                  if (!isNaN(id)) {
+                      idlist.push(id)
+                  }
+              }
+          }
+          var url = '{{ url_for('components.components', components='') }}' + idlist.join('+');
+          document.getElementById('graphlink').href = url;
+      }
+  </script>
+</head>
+
+<body>
+    <table> 
+    <tr>
+    {% for item in headings -%}
+      <th>{{ item }}</th>
+    {% endfor -%}
+    <th>View</th>
+    </tr>
+    {% for row in table -%}
+      {% set rowloop = loop -%}
+      <tr>
+      {% for item in row -%}
+        {% if loop.last and item == '' -%}
+        <td id="td_{{rowloop.index}}_{{loop.index}}"><button onclick="add_to_db('{{loop.previtem}}', 'td_{{rowloop.index}}_{{loop.index}}')">Fetch data</button></td>
+        {% else -%}
+        <td id="td_{{rowloop.index}}_{{loop.index}}">{{ item }}</td>
+        {% endif -%}
+      {% endfor -%}
+      <td><input type="checkbox" id="select_{{rowloop.index}}" checked=checked onclick="update_link()"></td>
+      </tr>
+    {% endfor -%}
+    </table>
+    <p/>
+    <center><h1><a id='graphlink' href='{{ url_for('components.components', components='') }}{{table | map('last') | select('number') | join('+') }}'>See the graphs!</a></h1></center>
+</body>
+</html>

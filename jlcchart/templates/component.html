@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>JLCPCB stock graphs</title>
+  <script src='https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.6.0/chart.min.js'></script>
+  <script src='https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js'></script>
+  <script src='https://cdnjs.cloudflare.com/ajax/libs/chartjs-adapter-moment/1.0.0/chartjs-adapter-moment.min.js'></script>
+</head>
+
+<body>
+<!---  <center> -->
+
+   {% for component in components %}
+    <canvas id="chart_{{component.id}}" width="600" height="400" style="display: inline;"></canvas>
+   {% endfor %}
+    <script>
+     {% for component in components %}
+      var chart_{{component.id}} = document.getElementById("chart_{{component.id}}").getContext("2d");
+      var LineChart_{{component.id}} = new Chart(chart_{{component.id}}, {
+          type: 'line',
+          data: {
+              datasets : [{
+                  label: '# in stock',
+                  data : [
+                  {% for item in component.data %}
+                      { x: '{{ item.timestamp }}', y: '{{item.value}}' },
+                  {% endfor %}]
+              }]
+          },
+          options: {
+              scales: {
+                  xAxis: {
+                      type: 'time',
+                      time: {
+                          unit: 'day'
+                      }
+                  },
+                  y: {
+                      beginAtZero: true
+                  }
+              },
+              responsive: false,
+              backgroundColor: "rgba(57, 204, 96, 0.7)",
+              borderColor: "rgba(57, 204, 96, 1)",
+              elements: {
+                  point: {
+                      pointBackgroundColor: "rgba(36, 128, 61, 0.7)",
+                      pointBorderColor: "rgba(36, 128, 61, 1)",
+                  }
+              },
+              plugins: {
+                  title: {
+                      display: true,
+                      text: ' {{ component.code }} : {{ component.name }} ',
+                      position: 'bottom'
+                  }
+              }
+          }
+      });
+     {% endfor %}
+    </script>
+<!---  </center> -->
+</body>
+</html>
