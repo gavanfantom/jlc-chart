@@ -1,0 +1,7 @@
+#!/bin/sh
+
+cd $(dirname $0)
+
+PATH=/usr/local/bin:${PATH}
+
+flask poll >poll.log 2>&1
