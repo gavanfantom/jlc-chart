@@ -1,4 +1,7 @@
-import sqlite3
+try:
+    import pysqlite3 as sqlite3
+except (ImportError, ModuleNotFoundError):
+    import sqlite3
 
 import click
 from flask import current_app, g
